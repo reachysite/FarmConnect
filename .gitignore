@@ -1,0 +1,8 @@
+﻿node_modules
+.next
+prisma/dev.db
+*.log
+.env
+.vercel
+download-images.mjs
+setup-images.mjs

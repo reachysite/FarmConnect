@@ -1,0 +1,114 @@
+generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+ provider = "postgresql"
+  url      = env("DATABASE_URL")
+}
+
+model User {
+  id        String   @id @default(cuid())
+  name      String
+  email     String   @unique
+  password  String
+  phone     String   @default("")
+  address   String   @default("")
+  role      String   @default("BUYER") // FARMER, BUYER, LOGISTICS, ADMIN
+  image     String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  farms      Farm[]
+  orders     Order[]
+  deliveries Delivery[]
+  reviews    Review[]
+}
+
+model Farm {
+  id           String   @id @default(cuid())
+  farmerId     String
+  farmName     String
+  location     String
+  description  String   @default("")
+  image        String   @default("")
+  rating       Float    @default(0)
+  createdAt    DateTime @default(now())
+  updatedAt    DateTime @updatedAt
+
+  farmer   User      @relation(fields: [farmerId], references: [id])
+  products Product[]
+}
+
+model Product {
+  id          String    @id @default(cuid())
+  farmId      String
+  name        String
+  description String    @default("")
+  price       Float
+  quantity    Int       @default(0)
+  unit        String    @default("kg")
+  category    String    @default("vegetables")
+  image       String    @default("")
+  harvestDate DateTime?
+  createdAt   DateTime  @default(now())
+  updatedAt   DateTime  @updatedAt
+
+  farm         Farm       @relation(fields: [farmId], references: [id])
+  orderItems   OrderItem[]
+  reviews      Review[]
+}
+
+model Order {
+  id              String   @id @default(cuid())
+  buyerId         String
+  totalAmount     Float
+  status          String   @default("PENDING") // PENDING, PAID, SHIPPED, DELIVERED, CANCELLED
+  paymentMethod   String   @default("")
+  deliveryAddress String
+  phone           String   @default("")
+  createdAt       DateTime @default(now())
+  updatedAt       DateTime @updatedAt
+
+  buyer      User        @relation(fields: [buyerId], references: [id])
+  orderItems OrderItem[]
+  delivery   Delivery?
+}
+
+model OrderItem {
+  id        String @id @default(cuid())
+  orderId   String
+  productId String
+  quantity  Int
+  price     Float
+
+  order   Order   @relation(fields: [orderId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
+
+model Delivery {
+  id            String   @id @default(cuid())
+  orderId       String   @unique
+  driverId      String
+  status        String   @default("PENDING") // PENDING, PICKED_UP, IN_TRANSIT, DELIVERED
+  trackingCode  String   @default("")
+  deliveredAt   DateTime?
+  createdAt     DateTime @default(now())
+  updatedAt     DateTime @updatedAt
+
+  order  Order  @relation(fields: [orderId], references: [id])
+  driver User   @relation(fields: [driverId], references: [id])
+}
+
+model Review {
+  id        String   @id @default(cuid())
+  userId    String
+  productId String
+  rating    Int
+  comment   String   @default("")
+  createdAt DateTime @default(now())
+  updatedAt DateTime @updatedAt
+
+  user    User    @relation(fields: [userId], references: [id])
+  product Product @relation(fields: [productId], references: [id])
+}
