@@ -1,7 +1,4 @@
 ﻿import { NextRequest, NextResponse } from "next/server"
-import { writeFile, mkdir } from "fs/promises"
-import { join } from "path"
-import { randomUUID } from "crypto"
 
 export async function POST(request: NextRequest) {
   try {
@@ -21,26 +18,12 @@ export async function POST(request: NextRequest) {
       return NextResponse.json({ error: "File size must be less than 5MB" }, { status: 400 })
     }
 
-    const ext = file.name.split(".").pop()?.toLowerCase() || "png"
-    const allowedExts = ["jpg", "jpeg", "png", "webp", "gif"]
-    if (!allowedExts.includes(ext)) {
-      return NextResponse.json({ error: "Invalid file extension" }, { status: 400 })
-    }
-
-    const filename = randomUUID() + "." + ext
-
-    const uploadDir = join(process.cwd(), "public", "images", "products")
-    await mkdir(uploadDir, { recursive: true })
-
     const bytes = await file.arrayBuffer()
     const buffer = Buffer.from(bytes)
-    const filepath = join(uploadDir, filename)
+    const base64 = buffer.toString("base64")
+    const url = "data:" + file.type + ";base64," + base64
 
-    await writeFile(filepath, buffer)
-
-    const url = "/images/products/" + filename
-
-    return NextResponse.json({ url, filename })
+    return NextResponse.json({ url })
   } catch (error) {
     console.error("Image upload error:", error)
     return NextResponse.json({ error: "Failed to upload image" }, { status: 500 })
