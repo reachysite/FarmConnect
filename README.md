@@ -17,6 +17,7 @@ FarmConnect is a web-based platform designed to connect farmers, buyers, and agr
 
 
 
-<img width="1915" height="940" alt="Screenshot 2026-06-14 175955" src="https://github.com/user-attachments/assets/19babf9d-c500-47b8-b8ed-579e4cca9cbf" />
+<img width="1849" height="950" alt="image" src="https://github.com/user-attachments/assets/dc012ac5-a868-48fa-be95-faadc451b26f" />
+
 
 
